@@ -83,10 +83,15 @@ public class PersonService {
 
     public ResponseEntity<HttpStatus> delete(ObjectId personId) {
         try {
-            log.info("borrar {}", personId);
-            personRepository.deleteById(personId);
-            log.info("borrado: {}", personId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            Optional<PersonEntity> personEntityOptional = personRepository.findById(personId);
+
+            if (personEntityOptional.isPresent()) {
+                PersonEntity personEntity = personEntityOptional.get();
+                personRepository.delete(personEntity);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             log.error("Error al eliminar persona con id: {}", personId);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
